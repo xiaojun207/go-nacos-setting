@@ -2,7 +2,6 @@ package nacos
 
 import (
 	"log"
-	"os"
 	"testing"
 )
 
