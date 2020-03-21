@@ -6,6 +6,8 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"github.com/xiaojun207/go-base-utils/utils"
+	"log"
+	"os"
 	"strings"
 )
 
@@ -21,6 +23,7 @@ type NacosSetting struct {
 
 	ConfigDataId string
 	ConfigGroup  string
+	ShowLog      bool
 }
 
 func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
@@ -137,6 +140,9 @@ func Init(nacosSetting NacosSetting, OnConfigLoad func(properties map[string]str
 			OnConfigLoad(properties)
 		},
 	})
+	if nacosSetting.ShowLog {
+		log.SetOutput(os.Stdout)
+	}
 }
 
 func Properties(data string) map[string]string {

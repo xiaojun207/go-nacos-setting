@@ -1,7 +1,8 @@
 package nacos
 
 import (
-	"fmt"
+	"log"
+	"os"
 	"testing"
 )
 
@@ -18,8 +19,8 @@ func TestInit(t *testing.T) {
 }
 
 func OnConfigLoad(properties map[string]string) {
-	fmt.Println("---------------------------------------------------------------------------------------")
+	log.Printf("---------------------------------------------------------------------------------------")
 	for key, value := range properties {
-		fmt.Println("onload, key:" + key + ", \tvalue:" + value)
+		log.Println("onload, key:" + key + ", \tvalue:" + value)
 	}
 }
