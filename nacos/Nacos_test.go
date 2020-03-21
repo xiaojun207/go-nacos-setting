@@ -1,18 +1,18 @@
-package main
+package nacos
 
 import (
 	"fmt"
-	"go-nacos-setting/nacos"
+	"testing"
 )
 
-func main() {
-	nacosSetting := nacos.NacosSetting{
+func TestInit(t *testing.T) {
+	nacosSetting := NacosSetting{
 		AppId:         "nacos-demo",
 		NacosServerIp: "127.0.0.1",
 		ClientPort:    8080,
 	}
 
-	nacos.Init(nacosSetting, OnConfigLoad)
+	Init(nacosSetting, OnConfigLoad)
 
 	select {}
 }
