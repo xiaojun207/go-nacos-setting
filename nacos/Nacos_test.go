@@ -17,9 +17,9 @@ func TestInit(t *testing.T) {
 	select {}
 }
 
-func OnConfigLoad(properties map[string]string) {
+func OnConfigLoad(conf map[string]interface{}) {
 	log.Printf("---------------------------------------------------------------------------------------")
-	for key, value := range properties {
-		log.Println("onload, key:" + key + ", \tvalue:" + value)
+	for key, value := range conf {
+		log.Println("onload, key:", key, " \tvalue:", value)
 	}
 }
