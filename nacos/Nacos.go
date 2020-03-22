@@ -6,6 +6,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"github.com/xiaojun207/go-base-utils/utils"
+	yaml "gopkg.in/yaml.v2"
 	"log"
 	"os"
 	"strings"
@@ -23,6 +24,7 @@ type NacosSetting struct {
 
 	ConfigDataId string
 	ConfigGroup  string
+	ConfigType   string // JSON、YAML、Properties
 	ShowLog      bool
 }
 
@@ -60,6 +62,10 @@ func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
 		nacosSetting.ConfigGroup = "DEFAULT_GROUP"
 	}
 
+	if nacosSetting.ConfigType == "" {
+		nacosSetting.ConfigType = "Properties"
+	}
+
 	if nacosSetting.ClientIp == "" {
 		ip, err := utils.ExternalIP()
 		if err != nil {
@@ -71,7 +77,7 @@ func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
 	return nacosSetting
 }
 
-func Init(nacosSetting NacosSetting, OnConfigLoad func(properties map[string]string)) {
+func Init(nacosSetting NacosSetting, OnConfigLoad func(conf map[string]interface{})) {
 
 	nacosSetting = setDefaultSetting(nacosSetting)
 
@@ -82,6 +88,7 @@ func Init(nacosSetting NacosSetting, OnConfigLoad func(properties map[string]str
 		BeatInterval:   5 * 1000,
 		LogDir:         "nacos/logs",
 		CacheDir:       "nacos/cache",
+		SecretKey:      "",
 	}
 
 	// 至少一个
@@ -121,14 +128,14 @@ func Init(nacosSetting NacosSetting, OnConfigLoad func(properties map[string]str
 		Ephemeral:   true,
 	})
 
-	fmt.Println("namingClient:", success)
+	log.Println("namingClient:", success)
 
 	_, err = configClient.GetConfig(vo.ConfigParam{
 		DataId: nacosSetting.ConfigDataId,
 		Group:  nacosSetting.ConfigGroup})
 
 	if err != nil {
-		fmt.Println("configClient:", err)
+		log.Println("configClient:", err)
 	}
 	//fmt.Println("configClient:", content)
 
@@ -136,8 +143,18 @@ func Init(nacosSetting NacosSetting, OnConfigLoad func(properties map[string]str
 		DataId: nacosSetting.ConfigDataId,
 		Group:  nacosSetting.ConfigGroup,
 		OnChange: func(namespace, group, dataId, data string) {
-			var properties = Properties(data)
-			OnConfigLoad(properties)
+			// JSON、YAML、Properties
+			conf := make(map[string]interface{})
+			if nacosSetting.ConfigType == "Properties" {
+				conf = Properties(data)
+			} else if nacosSetting.ConfigType == "Yaml" {
+				conf = Yaml(data)
+			} else if nacosSetting.ConfigType == "JSON" {
+				utils.JsonToMap(data, conf)
+			} else {
+				conf = Properties(data)
+			}
+			OnConfigLoad(conf)
 		},
 	})
 	if nacosSetting.ShowLog {
@@ -145,14 +162,37 @@ func Init(nacosSetting NacosSetting, OnConfigLoad func(properties map[string]str
 	}
 }
 
-func Properties(data string) map[string]string {
-	var properties = make(map[string]string)
+/**
+  Properties文本转map，支持注释
+*/
+func Properties(data string) map[string]interface{} {
+	var resultMap = make(map[string]interface{})
 	lines := strings.Split(data, "\n")
 	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "#") {
+			continue
+		}
+
 		kv := strings.Split(line, "=")
 		key := strings.TrimSpace(kv[0])
-		value := strings.TrimSpace(kv[1])
-		properties[key] = value
+		value := kv[1]
+		idx := strings.Index(value, "#")
+		if idx >= 0 {
+			value = strings.Split(value, "#")[0]
+		}
+		value = strings.TrimSpace(value)
+
+		resultMap[key] = value
 	}
-	return properties
+	return resultMap
+}
+
+func Yaml(data string) map[string]interface{} {
+	resultMap := make(map[string]interface{})
+	err := yaml.Unmarshal([]byte(data), &resultMap)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
+	}
+	return resultMap
 }
