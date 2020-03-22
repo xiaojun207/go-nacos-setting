@@ -47,7 +47,7 @@ func OnConfigLoad(conf map[string]interface{}) {
         ConfigDataId    string  // 默认：{AppId}
         ConfigGroup     string  // 默认：DEFAULT_GROUP
         ConfigType      string  // 默认：Properties，支持：JSON、YAML、Properties，所有的配置均以map[string]interface{}回调
-        ShowLog         bool    // 默认：false，因为nacos go 客户端设置了log输出到日志文件，不会显示到控制台。当ShowLog=true，日志会显示到控制台
+        ShowLog         bool    // 默认：false，因为nacos go sdk设置了log输出到日志文件，不会显示到控制台。当ShowLog=true，日志会显示到控制台
     }
 
 ```
