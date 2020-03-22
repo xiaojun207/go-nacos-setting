@@ -147,7 +147,7 @@ func Init(nacosSetting NacosSetting, OnConfigLoad func(conf map[string]interface
 			conf := make(map[string]interface{})
 			if nacosSetting.ConfigType == "Properties" {
 				conf = Properties(data)
-			} else if nacosSetting.ConfigType == "Yaml" {
+			} else if nacosSetting.ConfigType == "YAML" {
 				conf = Yaml(data)
 			} else if nacosSetting.ConfigType == "JSON" {
 				utils.JsonToMap(data, conf)
@@ -171,6 +171,10 @@ func Properties(data string) map[string]interface{} {
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		if !strings.Contains(line, "=") {
 			continue
 		}
 

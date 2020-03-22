@@ -10,6 +10,8 @@ func TestInit(t *testing.T) {
 		AppId:         "nacos-demo",
 		NacosServerIp: "127.0.0.1",
 		ClientPort:    8080,
+		ShowLog:       true,
+		ConfigType:    "YAML",
 	}
 
 	Init(nacosSetting, OnConfigLoad)
@@ -18,7 +20,8 @@ func TestInit(t *testing.T) {
 }
 
 func OnConfigLoad(conf map[string]interface{}) {
-	log.Printf("---------------------------------------------------------------------------------------")
+	log.Println("-----OnConfigLoad----------------------------------------------------------------------------------")
+	log.Println(len(conf))
 	for key, value := range conf {
 		log.Println("onload, key:", key, " \tvalue:", value)
 	}

@@ -14,9 +14,11 @@ import (
 fun main(){
 
 	nacosSetting := nacos.NacosSetting{
-		AppId:         "nacos-demo",
-		NacosServerIp: "127.0.0.1",
-		ClientPort:    8080,
+		AppId         :"nacos-demo",
+		NacosServerIp :"127.0.0.1",
+		ClientPort    :8080,
+		ShowLog       :true,
+		ConfigType    :"YAML",
 	}
 	nacos.Init(nacosSetting, OnConfigLoad)
 
