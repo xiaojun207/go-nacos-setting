@@ -13,19 +13,21 @@ import (
 )
 
 type NacosSetting struct {
-	AppId           string
-	NacosServerIp   string // 默认: 127.0.0。1
-	NacosServerPort uint64 // 默认: 8848
-	ClientIp        string // 默认获取本机IP
-	ClientPort      uint64 // 默认80
+	AppId           string // 【必填】，例如：bj-yun-nacos-demo
+	NacosServerIp   string // 【选填】，默认: 127.0.0。1
+	NacosServerPort uint64 // 【选填】，默认: 8848
+	ClientIp        string // 【选填】，默认：获取本机IP，可以自己设定
+	ClientPort      uint64 // 【选填】，默认：80
 
-	ServiceName string
-	ClusterName string
+	ServiceName string // 【选填】，默认：{AppId}
+	ClusterName string // 【选填】，默认：default
 
-	ConfigDataId string
-	ConfigGroup  string
-	ConfigType   string // JSON、YAML、Properties
-	ShowLog      bool
+	ConfigDataId string                            // 【选填】，默认：{AppId}
+	ConfigGroup  string                            // 【选填】，默认：DEFAULT_GROUP
+	ConfigType   string                            // 【选填】，默认：Properties，支持：JSON、YAML、Properties，所有的配置均以map[string]interface{}回调
+	OnConfigLoad func(conf map[string]interface{}) // 【选填】，配置更新回调
+
+	ShowLog bool // 【选填】，默认：false，因为nacos go sdk设置了log输出到日志文件，不会显示到控制台。当ShowLog=true，日志会显示到控制台
 }
 
 func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
@@ -66,6 +68,12 @@ func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
 		nacosSetting.ConfigType = "Properties"
 	}
 
+	if nacosSetting.OnConfigLoad == nil {
+		nacosSetting.OnConfigLoad = func(conf map[string]interface{}) {
+			log.Println("There is no OnConfigLoad function!")
+		}
+	}
+
 	if nacosSetting.ClientIp == "" {
 		ip, err := utils.ExternalIP()
 		if err != nil {
@@ -77,7 +85,7 @@ func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
 	return nacosSetting
 }
 
-func Init(nacosSetting NacosSetting, OnConfigLoad func(conf map[string]interface{})) {
+func Init(nacosSetting NacosSetting) {
 
 	nacosSetting = setDefaultSetting(nacosSetting)
 
@@ -154,7 +162,7 @@ func Init(nacosSetting NacosSetting, OnConfigLoad func(conf map[string]interface
 			} else {
 				conf = Properties(data)
 			}
-			OnConfigLoad(conf)
+			nacosSetting.OnConfigLoad(conf)
 		},
 	})
 	if nacosSetting.ShowLog {
