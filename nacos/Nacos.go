@@ -188,12 +188,36 @@ func Init(nacosSetting NacosSetting) {
 	}
 }
 
-func (e *NacosConfig) GetValue(key, defalueValue string) string {
-	value := e.Properties[key]
+func (e *NacosConfig) GetValue(key string) string {
+	return e.Properties[key]
+}
+
+func (e *NacosConfig) GetString(key, defalueValue string) string {
+	value := e.GetValue(key)
 	if value == "" {
 		value = defalueValue
 	}
 	return value
+}
+
+func (e *NacosConfig) GetFloat64(key string, defalueValue float64) float64 {
+	str := e.GetValue(key)
+	return utils.StrToFloat64Def(str, defalueValue)
+}
+
+func (e *NacosConfig) GetBool(key string, defalueValue bool) bool {
+	str := e.GetValue(key)
+	return utils.StrToBoolDef(str, defalueValue)
+}
+
+func (e *NacosConfig) GetInt(key string, defalueValue int) int {
+	str := e.GetValue(key)
+	return utils.StrToIntDef(str, defalueValue)
+}
+
+func (e *NacosConfig) GetInt64(key string, defalueValue int64) int64 {
+	str := e.GetValue(key)
+	return utils.StrToInt64Def(str, defalueValue)
 }
 
 /**
