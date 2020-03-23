@@ -22,10 +22,10 @@ func TestInit(t *testing.T) {
 	select {}
 }
 
-func OnConfigLoad(conf map[string]interface{}) {
+func OnConfigLoad(conf NacosConfig) {
 	log.Println("-----OnConfigLoad----------------------------------------------------------------------------------")
-	log.Println(len(conf))
-	printlnStrMap(conf)
+	log.Println(len(conf.Content))
+	printlnStrMap(conf.YAML)
 }
 
 func printlnStrMap(conf map[string]interface{}) {

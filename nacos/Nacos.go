@@ -22,12 +22,24 @@ type NacosSetting struct {
 	ServiceName string // 【选填】，默认：{AppId}
 	ClusterName string // 【选填】，默认：default
 
-	ConfigDataId string                            // 【选填】，默认：{AppId}
-	ConfigGroup  string                            // 【选填】，默认：DEFAULT_GROUP
-	ConfigType   string                            // 【选填】，默认：Properties，支持：JSON、YAML、Properties，所有的配置均以map[string]interface{}回调
-	OnConfigLoad func(conf map[string]interface{}) // 【选填】，配置更新回调
+	ConfigDataId string                 // 【选填】，默认：{AppId}
+	ConfigGroup  string                 // 【选填】，默认：DEFAULT_GROUP
+	ConfigType   string                 // 【选填】，默认：Properties，支持：JSON、YAML、Properties，所有的配置均以map[string]interface{}回调
+	OnConfigLoad func(conf NacosConfig) // 【选填】，配置更新回调
 
 	ShowLog bool // 【选填】，默认：false，因为nacos go sdk设置了log输出到日志文件，不会显示到控制台。当ShowLog=true，日志会显示到控制台
+}
+
+type NacosConfig struct {
+	DataId     string `param:"dataId"`
+	Group      string `param:"group"`
+	Content    string `param:"content"`
+	Namespace  string `param:"namespace"`
+	ConfigType string `param:"configType"`
+	Properties map[string]string
+	JSON       map[string]interface{}
+	YAML       map[string]interface{}
+	OnChange   func(namespace, group, dataId, data string)
 }
 
 func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
@@ -69,7 +81,7 @@ func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
 	}
 
 	if nacosSetting.OnConfigLoad == nil {
-		nacosSetting.OnConfigLoad = func(conf map[string]interface{}) {
+		nacosSetting.OnConfigLoad = func(conf NacosConfig) {
 			log.Println("There is no OnConfigLoad function!")
 		}
 	}
@@ -151,18 +163,24 @@ func Init(nacosSetting NacosSetting) {
 		DataId: nacosSetting.ConfigDataId,
 		Group:  nacosSetting.ConfigGroup,
 		OnChange: func(namespace, group, dataId, data string) {
-			// JSON、YAML、Properties
-			conf := make(map[string]interface{})
-			if nacosSetting.ConfigType == "Properties" {
-				conf = Properties(data)
-			} else if nacosSetting.ConfigType == "YAML" {
-				conf = Yaml(data)
-			} else if nacosSetting.ConfigType == "JSON" {
-				utils.JsonToMap(data, conf)
-			} else {
-				conf = Properties(data)
+
+			nacosConfig := NacosConfig{
+				ConfigType: nacosSetting.ConfigType,
+				Content:    data,
 			}
-			nacosSetting.OnConfigLoad(conf)
+			// JSON、YAML、Properties
+			if nacosSetting.ConfigType == "Properties" {
+				nacosConfig.Properties = Properties(data)
+			} else if nacosSetting.ConfigType == "YAML" {
+				nacosConfig.YAML = Yaml(data)
+			} else if nacosSetting.ConfigType == "JSON" {
+				nacosConfig.JSON = make(map[string]interface{})
+				utils.JsonToMap(data, nacosConfig.JSON)
+			} else {
+				nacosConfig.Properties = Properties(data)
+			}
+
+			nacosSetting.OnConfigLoad(nacosConfig)
 		},
 	})
 	if nacosSetting.ShowLog {
@@ -170,11 +188,19 @@ func Init(nacosSetting NacosSetting) {
 	}
 }
 
+func (e *NacosConfig) GetValue(key, defalueValue string) string {
+	value := e.Properties[key]
+	if value == "" {
+		value = defalueValue
+	}
+	return value
+}
+
 /**
   Properties文本转map，支持注释
 */
-func Properties(data string) map[string]interface{} {
-	var resultMap = make(map[string]interface{})
+func Properties(data string) map[string]string {
+	var resultMap = make(map[string]string)
 	lines := strings.Split(data, "\n")
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
@@ -207,4 +233,12 @@ func Yaml(data string) map[string]interface{} {
 		log.Fatalf("Unmarshal: %v", err)
 	}
 	return resultMap
+}
+
+func GetYamlValue(conf map[string]interface{}, key, defalueValue string) string {
+	value := conf[key]
+	if value == "" {
+		value = defalueValue
+	}
+	return value.(string)
 }

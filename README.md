@@ -27,11 +27,10 @@ fun main(){
 	select {}
 }
 
-func OnConfigLoad(conf map[string]interface{}) {
+func OnConfigLoad(conf NacosConfig) {
     log.Printf("---------------------------------------------------------------------------------------")
-    for key, value := range conf {
-        log.Println("onload, key:" , key , " \tvalue:" , value)
-    }
+    version := conf.GetValue("version", "1.0.0")
+    log.Println("version:", version)
 }
 
 ```
