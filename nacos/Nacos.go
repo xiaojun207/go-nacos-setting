@@ -27,19 +27,9 @@ type NacosSetting struct {
 	ConfigType   string                 // 【选填】，默认：Properties，支持：JSON、YAML、Properties，所有的配置均以map[string]interface{}回调
 	OnConfigLoad func(conf NacosConfig) // 【选填】，配置更新回调
 
-	ShowLog bool // 【选填】，默认：false，因为nacos go sdk设置了log输出到日志文件，不会显示到控制台。当ShowLog=true，日志会显示到控制台
-}
-
-type NacosConfig struct {
-	DataId     string `param:"dataId"`
-	Group      string `param:"group"`
-	Content    string `param:"content"`
-	Namespace  string `param:"namespace"`
-	ConfigType string `param:"configType"`
-	Properties map[string]string
-	JSON       map[string]interface{}
-	YAML       map[string]interface{}
-	OnChange   func(namespace, group, dataId, data string)
+	ShowLog bool   // 【选填】，默认：false，因为nacos go sdk设置了log输出到日志文件，不会显示到控制台。当ShowLog=true，日志会显示到控制台
+	AESKey  string // 【选填】，默认："", 当不为空时，会检测配置的值，如果是AESEncrypt()，包括起来的，则尝试解密
+	DESKey  string // 【选填】，默认："", 当不为空时，会检测配置的值，如果是DESEncrypt()，包括起来的，则尝试解密
 }
 
 func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
@@ -147,17 +137,7 @@ func Init(nacosSetting NacosSetting) {
 		Healthy:     true,
 		Ephemeral:   true,
 	})
-
 	log.Println("namingClient:", success)
-
-	_, err = configClient.GetConfig(vo.ConfigParam{
-		DataId: nacosSetting.ConfigDataId,
-		Group:  nacosSetting.ConfigGroup})
-
-	if err != nil {
-		log.Println("configClient:", err)
-	}
-	//fmt.Println("configClient:", content)
 
 	configClient.ListenConfig(vo.ConfigParam{
 		DataId: nacosSetting.ConfigDataId,
@@ -166,58 +146,22 @@ func Init(nacosSetting NacosSetting) {
 
 			nacosConfig := NacosConfig{
 				ConfigType: nacosSetting.ConfigType,
-				Content:    data,
+				Namespace:  namespace,
+				Group:      group,
+				DataId:     dataId,
+				DESKey:     nacosSetting.DESKey,
+				AESKey:     nacosSetting.AESKey,
 			}
-			// JSON、YAML、Properties
-			if nacosSetting.ConfigType == "Properties" {
-				nacosConfig.Properties = Properties(data)
-			} else if nacosSetting.ConfigType == "YAML" {
-				nacosConfig.YAML = Yaml(data)
-			} else if nacosSetting.ConfigType == "JSON" {
-				nacosConfig.JSON = make(map[string]interface{})
-				utils.JsonToMap(data, nacosConfig.JSON)
-			} else {
-				nacosConfig.Properties = Properties(data)
-			}
+			nacosConfig.LoadData(data)
 
 			nacosSetting.OnConfigLoad(nacosConfig)
 		},
 	})
+	log.Println("configClient.ListenConfig")
+
 	if nacosSetting.ShowLog {
 		log.SetOutput(os.Stdout)
 	}
-}
-
-func (e *NacosConfig) GetValue(key string) string {
-	return e.Properties[key]
-}
-
-func (e *NacosConfig) GetString(key, defalueValue string) string {
-	value := e.GetValue(key)
-	if value == "" {
-		value = defalueValue
-	}
-	return value
-}
-
-func (e *NacosConfig) GetFloat64(key string, defalueValue float64) float64 {
-	str := e.GetValue(key)
-	return utils.StrToFloat64Def(str, defalueValue)
-}
-
-func (e *NacosConfig) GetBool(key string, defalueValue bool) bool {
-	str := e.GetValue(key)
-	return utils.StrToBoolDef(str, defalueValue)
-}
-
-func (e *NacosConfig) GetInt(key string, defalueValue int) int {
-	str := e.GetValue(key)
-	return utils.StrToIntDef(str, defalueValue)
-}
-
-func (e *NacosConfig) GetInt64(key string, defalueValue int64) int64 {
-	str := e.GetValue(key)
-	return utils.StrToInt64Def(str, defalueValue)
 }
 
 /**

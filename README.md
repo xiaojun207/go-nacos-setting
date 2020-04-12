@@ -53,6 +53,8 @@ NacosSetting{
 	OnConfigLoad 	func(conf map[string]interface{}) // 【选填】，配置更新回调
 
 	ShowLog         bool    // 【选填】，默认：false，因为nacos go sdk设置了log输出到日志文件，不会显示到控制台。当ShowLog=true，日志会显示到控制台
+	AESKey  string // 【选填】，默认："", 当不为空时，会检测配置的值，如果是AESEncrypt()，包括起来的，则尝试解密
+	DESKey  string // 【选填】，默认："", 当不为空时，会检测配置的值，如果是DESEncrypt()，包括起来的，则尝试解密
 }
 
 ```
