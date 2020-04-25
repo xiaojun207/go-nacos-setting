@@ -3,13 +3,21 @@ package nacos
 import (
 	"fmt"
 	"github.com/nacos-group/nacos-sdk-go/clients"
+	"github.com/nacos-group/nacos-sdk-go/clients/config_client"
+	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
+	"github.com/nacos-group/nacos-sdk-go/model"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"github.com/xiaojun207/go-base-utils/utils"
 	yaml "gopkg.in/yaml.v2"
 	"log"
 	"os"
 	"strings"
+)
+
+var (
+	NamingClient naming_client.INamingClient
+	ConfigClient config_client.IConfigClient
 )
 
 type NacosSetting struct {
@@ -27,9 +35,11 @@ type NacosSetting struct {
 	ConfigType   string                 // 【选填】，默认：Properties，支持：JSON、YAML、Properties，所有的配置均以map[string]interface{}回调
 	OnConfigLoad func(conf NacosConfig) // 【选填】，配置更新回调
 
-	ShowLog bool   // 【选填】，默认：false，因为nacos go sdk设置了log输出到日志文件，不会显示到控制台。当ShowLog=true，日志会显示到控制台
-	AESKey  string // 【选填】，默认："", 当不为空时，会检测配置的值，如果是AESEncrypt()，包括起来的，则尝试解密
-	DESKey  string // 【选填】，默认："", 当不为空时，会检测配置的值，如果是DESEncrypt()，包括起来的，则尝试解密
+	ShowLog  bool   // 【选填】，默认：false，因为nacos go sdk设置了log输出到日志文件，不会显示到控制台。当ShowLog=true，日志会显示到控制台
+	AESKey   string // 【选填】，默认："", 当不为空时，会检测配置的值，如果是AESEncrypt()，包括起来的，则尝试解密
+	DESKey   string // 【选填】，默认："", 当不为空时，会检测配置的值，如果是DESEncrypt()，包括起来的，则尝试解密
+	Username string
+	Password string
 }
 
 func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
@@ -99,6 +109,8 @@ func Init(nacosSetting NacosSetting) {
 		LogDir:         "nacos/logs",
 		CacheDir:       "nacos/cache",
 		SecretKey:      "",
+		Username:       nacosSetting.Username,
+		Password:       nacosSetting.Password,
 	}
 
 	// 至少一个
@@ -162,6 +174,16 @@ func Init(nacosSetting NacosSetting) {
 	if nacosSetting.ShowLog {
 		log.SetOutput(os.Stdout)
 	}
+	NamingClient = namingClient
+	ConfigClient = configClient
+}
+
+func GetInstance(serviceName, clusterName string) (*model.Instance, error) {
+	instance, err := NamingClient.SelectOneHealthyInstance(vo.SelectOneHealthInstanceParam{
+		ServiceName: serviceName,
+		Clusters:    []string{clusterName},
+	})
+	return instance, err
 }
 
 /**
