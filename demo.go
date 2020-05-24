@@ -3,6 +3,7 @@ package main
 import (
 	"go-nacos-setting/nacos"
 	"log"
+	"time"
 )
 
 func main() {
@@ -10,16 +11,24 @@ func main() {
 		AppId:         "nacos-demo",
 		NacosServerIp: "127.0.0.1",
 		ClientPort:    8080,
-		ShowLog:       true,
+		ShowLog:       false,
 		OnConfigLoad:  OnConfigLoad,
-		//Username: "nacos",
-		//Password: "nacos",
+		Username:      "nacos",
+		Password:      "nacos",
 	}
 
 	nacos.Init(nacosSetting)
-	instance, err := nacos.GetInstance("nacos-demo", "default")
-	log.Println("instance:", instance)
-	log.Println("err:", err)
+
+	go func() {
+		for {
+			time.Sleep(time.Second)
+			instance, err := nacos.GetInstance("nacos-demo", "default")
+			if err != nil {
+				log.Println("err:", err)
+			}
+			log.Println("instance:", instance)
+		}
+	}()
 
 	select {}
 }
