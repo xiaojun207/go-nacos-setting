@@ -1,4 +1,4 @@
-module go-nacos-setting
+module github.com/xiaojun207/go-nacos-setting
 
 go 1.14
 

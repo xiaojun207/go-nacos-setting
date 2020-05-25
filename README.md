@@ -1,4 +1,4 @@
-# go-nacos-setting
+# github.com/xiaojun207/go-nacos-setting
 > 本项目，方便大家接入nacos。包括使用，注册中心和配置中心。其中使用了nacos官方sdk。
 
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-nacos-setting/nacos"
+	"github.com/xiaojun207/go-nacos-setting/nacos"
 	"log"
 	"time"
 )
