@@ -11,7 +11,7 @@ func main() {
 		AppId:         "nacos-demo",
 		NacosServerIp: "127.0.0.1",
 		ClientPort:    8080,
-		ShowLog:       false,
+		ShowLog:       true,
 		OnConfigLoad:  OnConfigLoad,
 		Username:      "nacos",
 		Password:      "nacos",
