@@ -11,23 +11,22 @@ func main() {
 		AppId:         "nacos-demo",
 		NacosServerIp: "127.0.0.1",
 		ClientPort:    8080,
-		ShowLog:       true,
 		OnConfigLoad:  OnConfigLoad,
 		Username:      "nacos",
 		Password:      "nacos",
 	}
 
-	nacos.Init(nacosSetting)
+	nacosSetting = *nacos.Init(nacosSetting)
 
 	go func() {
-		for {
-			time.Sleep(time.Second)
-			instance, err := nacos.GetInstance("nacos-demo", "default")
-			if err != nil {
-				log.Println("err:", err)
-			}
-			log.Println("instance:", instance)
+		//for {
+		time.Sleep(time.Second)
+		serviceAddress, err := nacosSetting.GetServiceAddress("nacos-demo")
+		if err != nil {
+			log.Println("err:", err)
 		}
+		log.Println("instance:", serviceAddress)
+		//}
 	}()
 
 	select {}
@@ -35,6 +34,7 @@ func main() {
 
 func OnConfigLoad(conf nacos.NacosConfig) {
 	log.Println("-----OnConfigLoad----------------------------------------------------------------------------------")
-	log.Println("conf.Content.length:", len(conf.Content))
+	log.Println(conf.Content)
+	//log.Println("conf.Content.length:", len(conf.Content))
 	//printlnStrMap(conf.YAML)
 }

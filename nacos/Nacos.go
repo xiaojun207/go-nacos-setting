@@ -11,7 +11,6 @@ import (
 	"github.com/xiaojun207/go-base-utils/utils"
 	yaml "gopkg.in/yaml.v2"
 	"log"
-	"os"
 	"strings"
 )
 
@@ -21,6 +20,9 @@ var (
 )
 
 type NacosSetting struct {
+	NamingClient naming_client.INamingClient
+	ConfigClient config_client.IConfigClient
+
 	AppId           string // 【必填】，例如：bj-yun-nacos-demo
 	NacosServerIp   string // 【选填】，默认: 127.0.0。1
 	NacosServerPort uint64 // 【选填】，默认: 8848
@@ -97,14 +99,14 @@ func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
 	return nacosSetting
 }
 
-func Init(nacosSetting NacosSetting) {
+func Init(nacosSetting NacosSetting) *NacosSetting {
 
 	nacosSetting = setDefaultSetting(nacosSetting)
 
 	// 可以没有，采用默认值
 	clientConfig := constant.ClientConfig{
 		TimeoutMs:      10 * 1000,
-		ListenInterval: 30 * 1000,
+		ListenInterval: 5 * 1000,
 		BeatInterval:   5 * 1000,
 		LogDir:         ".nacos/logs",
 		CacheDir:       ".nacos/cache",
@@ -171,19 +173,37 @@ func Init(nacosSetting NacosSetting) {
 	})
 	log.Println("configClient.ListenConfig")
 
-	if nacosSetting.ShowLog {
-		log.SetOutput(os.Stdout)
-	}
+	nacosSetting.NamingClient = namingClient
+	nacosSetting.ConfigClient = configClient
+
 	NamingClient = namingClient
 	ConfigClient = configClient
+	return &nacosSetting
 }
 
+// Dep
 func GetInstance(serviceName, clusterName string) (*model.Instance, error) {
 	instance, err := NamingClient.SelectOneHealthyInstance(vo.SelectOneHealthInstanceParam{
 		ServiceName: serviceName,
 		Clusters:    []string{clusterName},
 	})
 	return instance, err
+}
+
+func (e *NacosSetting) GetInstance(serviceName string) (*model.Instance, error) {
+	return e.NamingClient.SelectOneHealthyInstance(vo.SelectOneHealthInstanceParam{
+		ServiceName: serviceName,
+		Clusters:    []string{e.ClusterName},
+	})
+}
+
+func (e *NacosSetting) GetServiceAddress(appId string) (address string, err error) {
+	instance, err := e.GetInstance(appId)
+	if err != nil {
+		return
+	}
+	address = instance.Ip + ":" + utils.Uint64ToStr(instance.Port)
+	return
 }
 
 /**
