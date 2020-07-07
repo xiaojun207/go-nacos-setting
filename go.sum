@@ -95,6 +95,8 @@ github.com/xiaojun207/nacos-sdk-go v0.3.4 h1:u4uhYcFVGoDWkFqfeo7N0uZPTGilzYKBf9k
 github.com/xiaojun207/nacos-sdk-go v0.3.4/go.mod h1:4TdsN7eZnnVCDlOlBa61b0gsRnvNJI74m9+2+OKZkcw=
 github.com/xiaojun207/nacos-sdk-go v0.3.5 h1:xRSphDENnYQUFmDXITkI8oXAnl1EbhgVA9rDr/eOzxY=
 github.com/xiaojun207/nacos-sdk-go v0.3.5/go.mod h1:4TdsN7eZnnVCDlOlBa61b0gsRnvNJI74m9+2+OKZkcw=
+github.com/xiaojun207/nacos-sdk-go v0.3.6 h1:Mki1Dou/wVhbjIZbTZcUMHzJVgI16GgTgeanc83spP8=
+github.com/xiaojun207/nacos-sdk-go v0.3.6/go.mod h1:fti1GlX/EB6RDKvzK/P7Vuibqj0JMPJHQwrcTU1tLXk=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/net v0.0.0-20190311183353-d8887717615a h1:oWX7TPOiFAMXLq8o0ikBYfCJVlRHBcsciT5bXOrH628=
 golang.org/x/net v0.0.0-20190311183353-d8887717615a/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=

@@ -221,8 +221,7 @@ func Properties(data string) map[string]string {
 		if !strings.Contains(line, "=") {
 			continue
 		}
-
-		kv := strings.Split(line, "=")
+		kv := strings.SplitN(line, "=", 2)
 		key := strings.TrimSpace(kv[0])
 		value := kv[1]
 		idx := strings.Index(value, "#")

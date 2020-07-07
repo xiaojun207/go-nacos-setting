@@ -2,7 +2,7 @@ module github.com/xiaojun207/go-nacos-setting
 
 go 1.14
 
-replace github.com/nacos-group/nacos-sdk-go => github.com/xiaojun207/nacos-sdk-go v0.3.5
+replace github.com/nacos-group/nacos-sdk-go => github.com/xiaojun207/nacos-sdk-go v0.3.6
 
 require (
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.213 // indirect
