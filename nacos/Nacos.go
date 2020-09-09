@@ -42,6 +42,8 @@ type NacosSetting struct {
 	DESKey   string // 【选填】，默认："", 当不为空时，会检测配置的值，如果是DESEncrypt()，包括起来的，则尝试解密
 	Username string
 	Password string
+
+	Metadata map[string]string
 }
 
 func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
@@ -67,7 +69,7 @@ func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
 	}
 
 	if nacosSetting.ClusterName == "" {
-		nacosSetting.ClusterName = "default"
+		nacosSetting.ClusterName = "DEFAULT"
 	}
 
 	if nacosSetting.ConfigDataId == "" {
@@ -80,6 +82,10 @@ func setDefaultSetting(nacosSetting NacosSetting) NacosSetting {
 
 	if nacosSetting.ConfigType == "" {
 		nacosSetting.ConfigType = "Properties"
+	}
+
+	if nacosSetting.Metadata == nil {
+		nacosSetting.Metadata = map[string]string{"secure": "false", "preserved.register.source": "GO_NACOS_SETTING"}
 	}
 
 	if nacosSetting.OnConfigLoad == nil {
@@ -150,6 +156,7 @@ func Init(nacosSetting NacosSetting) *NacosSetting {
 		Enable:      true,
 		Healthy:     true,
 		Ephemeral:   true,
+		Metadata:    nacosSetting.Metadata,
 	})
 	log.Println("namingClient:", success)
 
