@@ -69,6 +69,8 @@ github.com/nacos-group/nacos-sdk-go v0.3.1 h1:MI7bNDAN5m9UFcRRUTSPfJi4dCQo+TYG85
 github.com/nacos-group/nacos-sdk-go v0.3.1/go.mod h1:ESKb6yF0gxSc8GuS+0jaMBe+n8rJ5/k4ya6LyFG2xi8=
 github.com/nacos-group/nacos-sdk-go v0.3.2 h1:q+ukmIImL6u0zBtbceMZl2frgeAc45QT6cIrTZZz50c=
 github.com/nacos-group/nacos-sdk-go v0.3.2/go.mod h1:4TdsN7eZnnVCDlOlBa61b0gsRnvNJI74m9+2+OKZkcw=
+github.com/nacos-group/nacos-sdk-go v1.0.0 h1:CufUF7DZca2ZzIrJtMMCDih1sA58BWCglArLMCZArUc=
+github.com/nacos-group/nacos-sdk-go v1.0.0/go.mod h1:hlAPn3UdzlxIlSILAyOXKxjFSvDJ9oLzTJ9hLAK1KzA=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
