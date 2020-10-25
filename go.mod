@@ -2,7 +2,7 @@ module github.com/xiaojun207/go-nacos-setting
 
 go 1.14
 
-replace github.com/nacos-group/nacos-sdk-go => github.com/xiaojun207/nacos-sdk-go v0.3.6
+replace github.com/nacos-group/nacos-sdk-go => github.com/xiaojun207/nacos-sdk-go v0.3.7
 
 require (
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.213 // indirect
@@ -13,7 +13,7 @@ require (
 	github.com/jmespath/go-jmespath v0.3.0 // indirect
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
-	github.com/nacos-group/nacos-sdk-go v0.3.2
+	github.com/nacos-group/nacos-sdk-go v1.0.0
 	github.com/xiaojun207/go-base-utils v0.0.1
 	gopkg.in/ini.v1 v1.56.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
