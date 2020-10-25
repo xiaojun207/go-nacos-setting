@@ -160,7 +160,7 @@ func Init(nacosSetting NacosSetting) *NacosSetting {
 	})
 	log.Println("namingClient:", success)
 
-	configClient.ListenConfig(vo.ConfigParam{
+	configParam := vo.ConfigParam{
 		DataId: nacosSetting.ConfigDataId,
 		Group:  nacosSetting.ConfigGroup,
 		OnChange: func(namespace, group, dataId, data string) {
@@ -177,8 +177,17 @@ func Init(nacosSetting NacosSetting) *NacosSetting {
 
 			nacosSetting.OnConfigLoad(nacosConfig)
 		},
-	})
+	}
+	configClient.ListenConfig(configParam)
 	log.Println("configClient.ListenConfig")
+
+	context, err := configClient.GetConfig(configParam)
+	if err != nil {
+		log.Println("GetConfig.err", err)
+	} else {
+		configParam.OnChange("", configParam.Group, configParam.DataId, context)
+		log.Println("GetConfig:", context)
+	}
 
 	nacosSetting.NamingClient = namingClient
 	nacosSetting.ConfigClient = configClient
