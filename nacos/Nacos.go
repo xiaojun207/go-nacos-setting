@@ -135,7 +135,7 @@ func Init(nacosSetting NacosSetting) *NacosSetting {
 		"clientConfig":  clientConfig,
 	})
 	if err != nil {
-		fmt.Println(err)
+		log.Println("CreateNamingClient.err", err)
 	}
 
 	configClient, err := clients.CreateConfigClient(map[string]interface{}{
@@ -144,10 +144,10 @@ func Init(nacosSetting NacosSetting) *NacosSetting {
 	})
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println("CreateConfigClient.err", err)
 	}
 
-	success, _ := namingClient.RegisterInstance(vo.RegisterInstanceParam{
+	success, err := namingClient.RegisterInstance(vo.RegisterInstanceParam{
 		Ip:          nacosSetting.ClientIp,
 		Port:        nacosSetting.ClientPort,
 		ServiceName: nacosSetting.ServiceName,
@@ -158,7 +158,10 @@ func Init(nacosSetting NacosSetting) *NacosSetting {
 		Ephemeral:   true,
 		Metadata:    nacosSetting.Metadata,
 	})
-	log.Println("namingClient:", success)
+	log.Println("RegisterInstance:", success)
+	if err != nil {
+		log.Println("RegisterInstance.err:", err)
+	}
 
 	configParam := vo.ConfigParam{
 		DataId: nacosSetting.ConfigDataId,
